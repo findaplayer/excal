@@ -3,11 +3,16 @@ defmodule Excal.Interface.Recurrence.Iterator do
 
   @on_load :load_nifs
 
+  app = Mix.Project.config[:app]
+
   @type initialization_error :: :invalid_dtstart | :invalid_rrule | :bad_iterator
   @type iterator_start_error :: :invalid_start | :start_invalid_for_rule
 
   @doc false
-  def load_nifs, do: :erlang.load_nif('./priv/recurrence/iterator', 0)
+  def load_nifs do
+    path = :filename.join(:code.priv_dir(unquote(app)), 'recurrence/iterator')
+    :ok = :erlang.load_nif(path, 0)
+  end
 
   @spec new(String.t(), String.t()) ::
           {:ok, reference()} | {:error, initialization_error()}
